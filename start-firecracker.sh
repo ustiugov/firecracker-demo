@@ -1,7 +1,8 @@
 #!/bin/bash -e
 SB_ID="${1:-0}" # Default to sb_id=0
 
-RO_DRIVE="$PWD/xenial.rootfs.ext4"
+#RO_DRIVE="$PWD/xenial.rootfs.ext4"
+RO_DRIVE="$PWD/xenial.rootfs_resized.ext4"
 
 # TODO: Boot vmlinuz/bzImage when supported, https://sim.amazon.com/issues/P12329852
 KERNEL="$PWD/vmlinux"
@@ -55,7 +56,7 @@ KERNEL_BOOT_ARGS="${KERNEL_BOOT_ARGS} ip=${FC_IP}::${TAP_IP}:${MASK_LONG}::eth0:
 # Start Firecracker API server
 rm -f "$API_SOCKET"
 
-./firecracker --api-sock "$API_SOCKET" --context '{"id": "fc-'${SB_ID}'", "jailed": false, "seccomp_level": 0, "start_time_us": 0, "start_time_cpu_us": 0}' &
+nohup ./firecracker --api-sock "$API_SOCKET" --context '{"id": "fc-'${SB_ID}'", "jailed": false, "seccomp_level": 0, "start_time_us": 0, "start_time_cpu_us": 0}' &
 
 sleep 0.015s
 
