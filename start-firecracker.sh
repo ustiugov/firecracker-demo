@@ -76,12 +76,12 @@ curl_put '/logger' <<EOF
 }
 EOF
 
-#curl_put '/machine-config' <<EOF
-#{
-#  "vcpu_count": 1,
-#  "mem_size_mib": 128
-#}
-#EOF
+curl_put '/machine-config' <<EOF
+{
+  "vcpu_count": $VCPU_COUNT,
+  "mem_size_mib": $VMEM_SIZE
+}
+EOF
 
 curl_put '/boot-source' <<EOF
 {
