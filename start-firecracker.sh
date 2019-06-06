@@ -95,7 +95,7 @@ curl_put '/drives/1' <<EOF
   "drive_id": "1",
   "path_on_host": "$RO_DRIVE",
   "is_root_device": true,
-  "is_read_only": false
+  "is_read_only": true
 }
 EOF
 #  "is_read_only": true
