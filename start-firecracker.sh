@@ -6,6 +6,7 @@ RO_DRIVE="$PWD/xenial.rootfs_resized.ext4"
 
 # TODO: Boot vmlinuz/bzImage when supported, https://sim.amazon.com/issues/P12329852
 KERNEL="$PWD/vmlinux"
+#KERNEL="/dcsldata1/ustiugov/linux/vmlinux"
 TAP_DEV="fc-${SB_ID}-tap0"
 
 KERNEL_BOOT_ARGS="panic=1 pci=off reboot=k tsc=reliable quiet 8250.nr_uarts=0 ipv6.disable=1 $R_INIT"
