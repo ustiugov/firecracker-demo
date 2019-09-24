@@ -58,6 +58,7 @@ KERNEL_BOOT_ARGS="${KERNEL_BOOT_ARGS} ip=${FC_IP}::${TAP_IP}:${MASK_LONG}::eth0:
 rm -f "$API_SOCKET"
 
 ./firecracker --api-sock "$API_SOCKET" --context '{"id": "fc-'${SB_ID}'", "jailed": false, "seccomp_level": 0, "start_time_us": 0, "start_time_cpu_us": 0}' &
+FC_PPID=$!
 
 sleep 0.015s
 
@@ -124,3 +125,17 @@ curl_put '/actions' <<EOF
 }
 EOF
 
+if [ ! -z "$FC_CPU_AFFIN" ]; then
+    declare -a FC_PIDS
+    FC_PIDS=( $(ps -L --pid $FC_PPID -o tid=) ) # outputs: parent process, VMM pid, VCPU0 pid, VCPU1 pid, ...
+    VMM_TID=${FC_PIDS[1]}
+    VCPU0_TID=${FC_PIDS[2]}
+
+    declare -a vmm_cpus
+    declare -a vcpu_cpus
+    vmm_cpus=(1 3 5 7 9 11 13 15)
+    vcpu_cpus=(25 27 29 31 33 35 37 39)
+    ind=$((SB_ID % 8)) # pin to 1 of the 8 cores
+    taskset -cp ${vmm_cpus[$ind]} $VMM_TID
+    taskset -cp ${vcpu_cpus[$ind]} $VCPU0_TID
+fi
