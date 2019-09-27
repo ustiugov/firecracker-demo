@@ -126,6 +126,10 @@ curl_put '/actions' <<EOF
 EOF
 
 if [ ! -z "$FC_CPU_AFFIN" ]; then
+    if (( SB_ID > 16 )); then
+        echo ERROR: FC_CPU_AFFIN is set but the number of VMs is more than 16. Exiting.
+        exit -1
+    fi
     declare -a FC_PIDS
     FC_PIDS=( $(ps -L --pid $FC_PPID -o tid=) ) # outputs: parent process, VMM pid, VCPU0 pid, VCPU1 pid, ...
     VMM_TID=${FC_PIDS[1]}
@@ -133,9 +137,12 @@ if [ ! -z "$FC_CPU_AFFIN" ]; then
 
     declare -a vmm_cpus
     declare -a vcpu_cpus
-    vmm_cpus=(1 3 5 7 9 11 13 15)
-    vcpu_cpus=(25 27 29 31 33 35 37 39)
-    ind=$((SB_ID % 8)) # pin to 1 of the 8 cores
+    #vmm_cpus=(1 3 5 7 9 11 13 15)
+    #vcpu_cpus=(25 27 29 31 33 35 37 39)
+    #ind=$((SB_ID % 8)) # pin to 1 of the 8 cores
+    vmm_cpus=(0 2 4 6 8 10 12 14 1 3 5 7 9 11 13 15)
+    vcpu_cpus=(24 26 28 30 32 34 36 38 25 27 29 31 33 35 37 39)
+    ind=$((SB_ID % 16)) # pin to 1 of the 16 cores
     taskset -cp ${vmm_cpus[$ind]} $VMM_TID
     taskset -cp ${vcpu_cpus[$ind]} $VCPU0_TID
 fi
