@@ -145,4 +145,19 @@ if [ ! -z "$FC_CPU_AFFIN" ]; then
     ind=$((SB_ID % 16)) # pin to 1 of the 16 cores
     taskset -cp ${vmm_cpus[$ind]} $VMM_TID
     taskset -cp ${vcpu_cpus[$ind]} $VCPU0_TID
+
+elif [ ! -z "$FC_POOL_AFFIN" ]; then
+    declare -a FC_PIDS
+    FC_PIDS=( $(ps -L --pid $FC_PPID -o tid=) ) # outputs: parent process, VMM pid, VCPU0 pid, VCPU1 pid, ...
+    VMM_TID=${FC_PIDS[1]}
+    VCPU0_TID=${FC_PIDS[2]}
+
+    declare -a vmm_cpus
+    declare -a vcpu_cpus
+    # 22,46,23,47 for IRQs
+    vcpu_cpus='3ffff03fffe0' #35 CPUs
+    vmm_cpus='00000f00001f' # 9 CPUs
+    ind=$((SB_ID % 16)) # pin to 1 of the 16 cores
+    taskset -p ${vmm_cpus} $VMM_TID
+    taskset -p ${vcpu_cpus} $VCPU0_TID
 fi
